@@ -19,11 +19,16 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
       - name: Build and push Docker Image
         uses: docker/build-push-action@v5
         with:
+          context: .
           platforms: linux/amd64,linux/arm64
-          tags: |
-            ghcr.io/giorgi-o/skinpeek/skinpeek:latest
-            ghcr.io/giorgi-o/skinpeek/skinpeek:"$GITHUB_SHA"
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           push: true
